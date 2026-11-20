@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>직장인구 및 사업체분석 | 진주경춘부동산</title>
+<style>
+:root{--ink:#142c40;--muted:#4c6372;--line:#dbe7eb;--jobs:#167a78;--firms:#33649b}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#eff5f7;font:15px/1.55 system-ui,"Malgun Gothic",sans-serif}a{color:inherit}header{background:linear-gradient(115deg,#122e47,#145c59);color:white;padding:1.2rem 0 2.3rem}.wrap{width:min(1180px,calc(100% - 2rem));margin:auto}.top,.controls{display:flex;flex-wrap:wrap;gap:.65rem 1.25rem;justify-content:space-between}.top a{text-underline-offset:.25em}h1{margin:1rem 0 .25rem;font-size:clamp(1.75rem,5vw,3.1rem);letter-spacing:-.055em}p{margin:0}main{padding:1.1rem 0 2rem}.panel,.card{background:white;border:1px solid var(--line);padding:1.05rem;border-radius:14px;min-width:0}.panel{margin-bottom:1rem}h2{font-size:1.2rem;margin:0 0 .45rem}.hint,footer,.card small{color:var(--muted);font-size:.85rem}.hint{margin:.25rem 0 .75rem}.cards,.pair,.map-layout{display:grid;gap:1rem}.cards{grid-template-columns:repeat(auto-fit,minmax(155px,1fr));margin-bottom:1rem}.card strong{display:block;font-size:1.5rem;color:#115e58}.card small{display:block}.pair,.map-layout{grid-template-columns:repeat(2,minmax(0,1fr))}.controls{justify-content:flex-start}select,input{font:inherit;padding:.35rem .55rem;border:1px solid #aabfc8;border-radius:6px;background:white;color:var(--ink)}:focus-visible{outline:3px solid #ab600c;outline-offset:2px}.chart{display:grid;gap:.32rem}.row{display:grid;grid-template-columns:3.3rem minmax(0,1fr) 5.85rem;gap:.4rem;align-items:center;font-size:.85rem}.rank .row{grid-template-columns:6.4rem minmax(0,1fr) 5.85rem}.row.selected{font-weight:750;background:#eff7fa;border-radius:5px}.track{height:.85rem;border-radius:4px;background:#e8eff2;overflow:hidden}.bar{height:100%;background:var(--series);border-radius:4px}.num{text-align:right;font-variant-numeric:tabular-nums}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;white-space:nowrap;font-size:.87rem}th,td{text-align:left;padding:.42rem .62rem;border-bottom:1px solid var(--line)}th{background:#edf5f7}.map{position:relative;height:360px;background:repeating-linear-gradient(0deg,#c9dfd9 0 1px,transparent 1px 20%),repeating-linear-gradient(90deg,#c9dfd9 0 1px,transparent 1px 20%),#eff7f5;border:1px solid var(--line);border-radius:8px}.map>span{position:absolute;right:.45rem;top:.3rem;color:var(--muted);font-size:.8rem;pointer-events:none}.pin{position:absolute;transform:translate(-50%,-50%);width:14px;height:14px;padding:0;border:1px solid white;border-radius:50%;background:var(--fill);cursor:pointer}.pin:hover,.pin:focus-visible,.pin[aria-pressed=true]{z-index:2;outline:2px solid #142c40;outline-offset:1px}.details{background:#f4f8fa;border-radius:8px;padding:.85rem;overflow:auto;max-height:360px}.details p{margin:.35rem 0}.details a{color:#155d83}.table-filter{display:block;margin:.65rem 0}.rank{margin-top:.6rem}footer{overflow-wrap:anywhere}@media(max-width:700px){.pair,.map-layout{grid-template-columns:1fr}.map{height:310px}.pin{width:12px;height:12px}}
+</style></head><body>
+<header><div class="wrap"><div class="top"><a href="index.html">진주경춘부동산공인중개사</a><a href="tel:010-3571-3311">010-3571-3311</a></div><h1>직장인구 및 사업체분석</h1><p>진주시 금산면 금산로 75 일대 · 2015~2024년 원본 격자 집계</p></div></header>
+<main class="wrap">
+<section class="panel"><h2>조회 조건</h2><div class="controls"><label>기준 연도 <select id="year"></select></label><label>지도·순위 지표 <select id="metric"><option value="0">직장인구</option><option value="1">사업체</option></select></label></div></section>
+<section id="cards" class="cards" aria-label="선택 연도 요약" aria-live="polite"></section>
+<div class="pair">
+<section class="panel"><h2>연도별 직장인구</h2><p class="hint">원본 합계 · 단위 명</p><div id="jobs" class="chart" style="--series:var(--jobs)"></div></section>
+<section class="panel"><h2>연도별 사업체 수</h2><p class="hint">원본 합계 · 단위 개</p><div id="firms" class="chart" style="--series:var(--firms)"></div></section>
+</div>
+<section class="panel"><h2>격자별 분포와 상위 10개 격자</h2><p class="hint" id="map-note"></p><div class="map-layout"><div id="map" class="map" role="group" aria-label="격자 중심 좌표 지도"></div><div><div id="rank" class="chart rank"></div><div id="details" class="details" aria-live="polite"></div></div></div></section>
+<section class="panel"><h2>격자별 상세</h2><label class="table-filter">격자코드 검색 <input id="search" type="search" placeholder="예: 라라576912"></label><p id="table-note" class="hint"></p><div class="scroll" tabindex="0" aria-label="격자별 통계 표"><table><thead><tr><th scope="col">격자코드</th><th scope="col" class="num">직장인구</th><th scope="col" class="num">사업체</th><th scope="col" class="num">직장인구 전년 증감</th><th scope="col" class="num">사업체 전년 증감</th><th scope="col">위치</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<footer>출처 · 직장사업체_병합데이터_경상남도 진주시 금산면 금산로 75_전체연도.csv<br>원본의 0은 그대로 반영했고 빈칸은 미집계로 표시합니다. 연도별 증감은 두 해 모두 값이 있는 공통 격자만 비교합니다. 원본 업종코드는 직장인구 to_em_020과 사업체 to_fa_010 두 종류로, 세부 업종별 비교에 필요한 항목은 제공되지 않았습니다.</footer>
+</main>
+<script type="application/json" id="data">[["라라576912",128.133426,35.21495568,[3,0,3,3,3,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,3]],["라라576913",128.133433,35.21585734,[0,0,0,0,0,3,0,3,0,0],[0,0,0,0,0,0,0,0,3,0]],["라라577910",128.1345106,35.21314661,[7,5,10,12,12,4,5,7,5,5],[3,3,3,3,5,3,3,3,3,3]],["라라577911",128.1345176,35.21404827,[5,14,7,23,23,10,11,9,21,15],[3,5,3,3,3,3,3,3,5,3]],["라라577912",128.1345247,35.21494992,[18,27,26,25,25,15,7,5,3,5],[3,3,5,3,3,5,3,5,3,3]],["라라578908",128.1355952,35.21133753,[10,18,23,10,10,15,8,7,7,5],[3,0,0,0,0,0,0,3,0,0]],["라라578912",128.1356233,35.21494416,[11,28,28,18,18,16,15,16,11,9],[5,4,8,4,4,4,4,4,4,4]],["라라578913",128.1356304,35.21584582,[0,0,0,0,0,0,3,0,0,0],[0,0,0,0,0,3,3,3,0,0]],["라라578914",128.1356374,35.21674747,[0,0,0,0,0,0,0,0,3,3],[0,0,0,0,0,0,0,0,0,0]],["라라579911",128.136715,35.21403673,[22,7,8,5,5,5,5,5,5,5],[5,3,5,5,5,3,5,5,3,3]],["라라579912",128.136722,35.21493839,[3,5,7,7,7,5,6,6,7,4],[0,0,0,3,0,3,0,3,3,3]],["라라580911",128.1378137,35.21403095,[42,28,15,26,26,12,36,5,13,19],[3,5,3,3,5,5,5,3,3,3]],["라라580912",128.1378207,35.21493261,[0,0,0,0,0,0,0,0,0,3],[0,0,0,0,0,0,3,3,0,0]],["라라580913",128.1378278,35.21583426,[7,4,4,4,4,4,4,6,6,5],[3,3,3,3,3,3,0,3,5,5]],["라라580914",128.1378348,35.21673592,[4,3,0,3,3,0,3,3,3,3],[3,3,0,0,3,3,3,0,0,3]],["라라580915",128.1378419,35.21763757,[0,0,0,3,3,0,3,0,3,3],[0,0,3,0,3,3,0,0,0,3]],["라라581910",128.1389053,35.2131235,[0,0,0,0,0,3,5,3,5,3],[0,0,0,0,0,3,3,5,5,3]],["라라581911",128.1389123,35.21402516,[49,84,8,15,15,9,10,12,9,12],[5,5,5,9,7,9,10,12,9,12]],["라라581913",128.1389265,35.21582847,[0,0,0,0,0,0,0,3,5,3],[0,0,0,0,0,0,0,0,3,3]],["라라581914",128.1389335,35.21673012,[0,0,0,0,0,0,0,0,3,0],[0,0,0,0,0,0,0,0,0,0]],["라라581915",128.1389406,35.21763178,[17,21,18,16,16,20,22,23,26,23],[3,3,3,3,3,5,5,5,5,5]],["라라582910",128.1400039,35.2131177,[6,12,12,16,16,23,28,13,11,16],[3,0,3,3,3,8,12,13,11,13]],["라라582911",128.140011,35.21401935,[29,33,33,32,32,33,27,28,28,22],[11,14,12,14,13,15,15,15,17,14]],["라라582912",128.1400181,35.21492101,[7,7,25,5,5,9,26,5,6,8],[3,3,5,3,0,3,5,3,3,5]],["라라582913",128.1400252,35.21582266,[0,4,4,0,0,0,0,0,0,null],[0,0,0,3,0,0,0,0,0,0]],["라라582914",128.1400322,35.21672432,[20,13,23,25,25,11,9,8,8,11],[3,7,8,8,5,5,5,5,5,5]],["라라582915",128.1400393,35.21762598,[31,26,31,30,30,24,22,14,10,18],[5,8,8,8,8,8,8,10,9,9]],["라라582916",128.1400464,35.21852763,[3,3,0,3,3,0,0,0,0,0],[3,3,0,3,3,0,0,0,3,3]],["라라583904",128.1410601,35.20770195,[6,8,7,7,7,6,7,6,6,5],[0,0,3,0,0,0,0,0,3,0]],["라라583910",128.1411026,35.21311188,[6,6,8,11,11,14,13,12,14,17],[0,0,0,0,5,5,3,3,5,5]],["라라583911",128.1411097,35.21401354,[19,18,48,22,22,21,15,17,19,19],[8,11,12,12,10,15,10,10,9,12]],["라라583912",128.1411168,35.2149152,[61,83,79,68,68,59,58,56,50,52],[15,16,14,14,15,15,19,19,19,18]],["라라583913",128.1411238,35.21581685,[90,119,128,187,187,250,162,164,36,37],[12,18,21,20,18,26,25,25,19,21]],["라라583914",128.1411309,35.21671851,[114,114,114,110,110,105,123,148,106,144],[0,0,0,3,0,0,0,3,0,3]],["라라583915",128.141138,35.21762016,[60,60,58,30,30,11,14,9,8,11],[9,8,8,5,5,5,5,8,5,5]],["라라583916",128.1411451,35.21852182,[9,7,8,10,10,5,5,7,9,17],[3,3,3,3,5,5,5,5,8,8]],["라라584911",128.1422083,35.21400772,[22,31,60,31,31,40,37,39,42,39],[12,11,15,13,14,15,18,18,17,16]],["라라584912",128.1422154,35.21490937,[4,0,5,10,10,8,7,7,5,3],[3,0,3,3,3,5,3,3,3,3]],["라라584913",128.1422225,35.21581103,[5,8,14,9,9,10,13,11,14,11],[5,5,5,5,5,5,5,5,5,7]],["라라584914",128.1422296,35.21671268,[72,73,69,78,78,80,82,79,83,75],[0,3,3,3,0,3,3,3,5,5]],["라라584915",128.1422367,35.21761434,[27,17,19,22,22,19,20,21,20,18],[3,5,5,9,5,8,9,10,8,9]],["라라584916",128.1422438,35.21851599,[12,12,15,16,16,14,12,8,3,3],[6,6,6,6,8,8,9,6,3,5]],["라라585910",128.1432999,35.21310023,[0,0,0,3,3,0,5,3,3,3],[0,0,3,3,0,0,3,3,3,3]],["라라585911",128.143307,35.21400188,[12,13,15,24,24,22,22,26,25,24],[8,8,9,8,7,11,8,13,9,9]],["라라585912",128.1433141,35.21490354,[3,3,0,0,0,0,0,3,3,0],[0,0,0,0,0,3,0,0,3,0]],["라라585914",128.1433283,35.21670685,[14,16,12,18,18,15,18,17,13,12],[6,8,7,7,10,10,12,10,10,9]],["라라585915",128.1433355,35.2176085,[28,32,31,95,95,113,125,125,124,126],[3,0,0,0,0,3,3,0,0,3]],["라라585916",128.1433426,35.21851016,[96,94,71,89,89,71,85,87,87,89],[3,3,3,0,0,0,3,0,0,0]],["라라585918",128.1433568,35.22031347,[52,72,55,0,0,3,3,4,41,38],[0,0,3,0,0,3,0,0,0,3]],["라라586911",128.1444057,35.21399604,[18,14,21,17,17,16,22,21,23,17],[9,8,9,7,8,10,10,10,10,12]],["라라586912",128.1444128,35.2148977,[7,9,7,7,7,7,7,7,9,11],[5,5,5,5,5,3,3,5,5,5]],["라라586913",128.1444199,35.21579935,[93,82,91,91,91,87,88,100,96,76],[0,3,5,5,5,5,5,5,5,5]],["라라586914",128.1444271,35.21670101,[0,0,0,0,0,3,0,0,0,0],[0,0,0,0,0,0,0,0,3,0]],["라라586915",128.1444342,35.21760266,[4,4,3,0,0,5,0,5,8,9],[0,0,0,0,0,3,3,5,8,9]],["라라586916",128.1444413,35.21850432,[0,0,0,0,0,5,11,9,11,10],[0,0,0,0,0,5,8,8,8,5]],["라라586917",128.1444484,35.21940597,[0,0,0,0,0,0,0,0,25,25],[0,0,0,0,0,0,0,0,3,5]],["라라587911",128.1455043,35.21399019,[5,5,5,3,3,3,5,5,3,3],[5,5,3,3,3,3,5,5,3,5]],["라라587912",128.1455115,35.21489184,[134,148,147,110,110,120,121,125,118,109],[49,47,46,42,43,47,49,52,47,46]],["라라587913",128.1455186,35.2157935,[9,9,9,13,13,14,12,14,13,12],[4,4,4,4,4,8,7,8,9,8]],["라라587914",128.1455258,35.21669515,[22,19,17,23,23,25,23,30,36,29],[8,8,8,8,8,14,14,15,19,15]],["라라587915",128.1455329,35.21759681,[158,156,144,178,178,144,138,160,147,146],[60,61,57,62,60,61,59,64,66,68]],["라라587916",128.14554,35.21849846,[18,20,21,20,20,22,22,22,20,19],[3,3,3,3,5,5,5,8,5,5]],["라라587917",128.1455472,35.21940012,[3,4,5,14,14,19,8,13,4,5],[3,3,3,0,3,5,5,9,4,5]],["라라587918",128.1455543,35.22030177,[0,0,0,0,0,0,0,3,3,0],[0,0,0,0,0,0,0,0,5,0]],["라라588911",128.146603,35.21398433,[31,31,39,38,38,35,23,22,18,12],[19,18,22,23,23,24,18,17,13,10]],["라라588912",128.1466102,35.21488598,[65,70,74,69,69,74,66,64,61,53],[23,29,27,32,28,33,31,32,27,24]],["라라588913",128.1466173,35.21578763,[35,63,42,37,37,36,34,50,48,44],[11,11,11,8,11,12,11,12,13,11]],["라라588914",128.1466245,35.21668929,[0,0,0,0,0,12,8,10,9,10],[0,0,0,0,3,10,8,10,9,8]],["라라588915",128.1466316,35.21759094,[38,30,31,37,37,38,40,49,50,33],[18,16,18,16,17,23,21,25,23,23]],["라라588916",128.1466388,35.2184926,[28,22,23,26,26,26,25,27,25,30],[8,9,8,8,11,12,13,11,10,16]],["라라588917",128.1466459,35.21939425,[34,29,31,22,22,19,24,26,25,20],[13,12,12,13,8,8,12,11,14,13]],["라라588918",128.1466531,35.22029591,[0,0,8,15,15,12,18,14,29,28],[0,0,3,8,8,8,11,12,12,12]],["라라589910",128.1476945,35.2130768,[12,11,11,17,17,14,16,14,20,15],[5,5,7,7,8,9,9,9,7,7]],["라라589911",128.1477017,35.21397845,[65,38,78,76,76,75,82,156,160,109],[8,5,5,5,5,5,5,5,5,5]],["라라589912",128.1477088,35.21488011,[0,3,8,16,16,9,11,14,8,7],[0,3,5,5,5,7,9,10,5,5]],["라라589913",128.147716,35.21578176,[13,23,23,25,25,17,16,15,16,18],[8,8,11,11,11,12,13,11,11,11]],["라라589914",128.1477232,35.21668342,[59,50,50,57,57,50,46,50,44,47],[22,21,20,23,18,18,14,16,20,23]],["라라589915",128.1477303,35.21758507,[8,9,5,8,8,14,18,19,42,50],[5,3,3,3,3,8,11,11,14,14]],["라라589916",128.1477375,35.21848672,[24,18,19,8,8,5,23,21,21,33],[3,3,3,3,3,5,9,9,10,10]],["라라589917",128.1477447,35.21938838,[27,14,13,13,13,19,22,25,23,27],[10,11,10,12,11,16,21,21,17,20]],["라라589918",128.1477518,35.22029003,[4,4,3,6,6,16,22,8,5,9],[0,3,3,3,5,5,12,8,5,9]],["라라589919",128.147759,35.22119168,[0,0,0,3,3,0,0,0,0,3],[0,0,0,0,3,0,0,3,3,0]],["라라590910",128.1487932,35.21307092,[28,23,25,25,25,22,29,26,26,24],[18,16,16,17,16,17,22,18,17,17]],["라라590911",128.1488003,35.21397257,[25,31,22,28,28,30,29,36,36,39],[5,5,5,5,8,11,11,14,11,20]],["라라590912",128.1488075,35.21487422,[3,5,3,6,6,11,16,17,22,19],[0,3,3,3,5,5,9,11,11,12]],["라라590913",128.1488147,35.21577588,[51,42,54,77,77,78,81,91,92,99],[31,29,35,37,32,41,39,39,36,37]],["라라590914",128.1488219,35.21667753,[3,3,0,0,0,0,3,0,3,0],[3,0,3,3,0,3,3,0,0,0]],["라라590915",128.148829,35.21757919,[49,45,54,54,54,39,42,46,43,41],[9,8,8,8,8,8,8,8,8,8]],["라라590916",128.1488362,35.21848084,[20,19,17,12,12,14,14,10,14,11],[3,5,5,5,5,7,7,5,5,5]],["라라590917",128.1488434,35.21938249,[4,3,3,23,23,35,20,21,19,15],[0,0,3,0,5,5,5,5,3,3]],["라라590918",128.1488506,35.22028415,[5,7,7,9,9,19,23,19,16,19],[0,0,0,0,0,8,11,8,9,8]],["라라590919",128.1488578,35.2211858,[31,30,30,33,33,33,34,39,33,34],[3,3,3,3,3,5,5,8,8,8]],["라라590920",128.1488649,35.22208745,[0,0,3,8,8,9,8,8,8,12],[0,0,0,3,5,5,5,5,5,5]],["라라591904",128.1498487,35.2076551,[3,3,8,7,7,5,5,8,7,4],[3,0,0,3,3,3,3,0,0,0]],["라라591909",128.1498846,35.21216337,[3,3,3,11,11,5,4,3,3,3],[3,3,3,5,3,3,3,5,3,3]],["라라591910",128.1498918,35.21306502,[3,4,11,12,12,11,16,19,23,12],[3,3,4,4,5,7,5,8,8,8]],["라라591911",128.149899,35.21396668,[27,28,32,27,27,26,32,33,35,26],[3,0,0,0,3,3,5,5,5,3]],["라라591912",128.1499062,35.21486833,[46,42,40,40,40,45,38,41,36,36],[5,3,5,5,5,15,14,14,10,10]],["라라591913",128.1499134,35.21576999,[0,0,0,0,0,5,5,3,5,5],[0,0,0,0,0,5,3,3,5,5]],["라라591914",128.1499206,35.21667164,[0,0,0,0,0,0,3,0,3,5],[0,0,0,0,0,3,0,0,3,0]],["라라591916",128.149935,35.21847495,[39,34,28,33,33,43,38,26,21,21],[3,5,3,5,5,8,8,5,5,5]],["라라591917",128.1499421,35.2193766,[24,23,22,20,20,18,15,15,20,23],[8,8,9,8,9,11,12,9,14,17]],["라라591918",128.1499493,35.22027825,[0,0,0,0,0,0,3,0,0,null],[0,0,0,0,0,0,0,0,0,0]],["라라591919",128.1499565,35.22117991,[0,0,0,0,0,20,11,9,17,9],[0,0,0,0,0,8,5,3,9,3]],["라라591920",128.1499637,35.22208156,[0,0,0,0,0,0,0,0,0,null],[0,0,0,0,0,0,0,0,0,0]],["라라592907",128.1509689,35.21035416,[0,3,3,3,3,3,3,3,3,3],[0,0,0,0,0,3,3,0,0,0]],["라라592908",128.1509761,35.21125581,[0,0,0,3,3,0,0,0,0,0],[0,0,0,3,0,3,3,3,3,3]],["라라592909",128.1509833,35.21215747,[45,48,47,51,51,46,48,46,40,44],[5,5,5,5,9,5,5,5,5,5]],["라라592910",128.1509905,35.21305912,[16,12,13,13,13,13,11,12,11,13],[6,5,6,6,6,6,9,9,7,9]],["라라592912",128.1510049,35.21486243,[7,8,8,9,9,13,15,14,17,15],[0,0,0,0,0,5,5,5,5,5]],["라라592913",128.1510121,35.21576408,[0,0,0,0,0,3,0,0,3,3],[0,0,0,0,0,3,3,3,0,3]],["라라592917",128.1510409,35.2193707,[7,5,8,12,12,8,10,11,7,7],[3,3,5,3,3,3,5,3,3,3]],["라라592918",128.1510481,35.22027235,[13,27,61,67,67,59,79,94,87,81],[5,9,13,13,14,14,17,20,17,17]],["라라592919",128.1510553,35.221174,[7,3,6,6,6,3,0,0,0,null],[3,0,3,0,0,3,3,3,0,0]],["라라592920",128.1510625,35.22207565,[0,0,0,0,0,3,4,3,3,3],[0,0,0,0,0,3,3,3,0,3]],["라라593912",128.1521036,35.21485652,[6,6,7,6,6,12,13,12,12,3],[0,0,0,3,0,8,5,5,5,3]],["라라593913",128.1521108,35.21575817,[0,0,0,3,3,3,5,5,3,5],[0,0,0,0,0,3,5,5,5,3]],["라라593917",128.1521396,35.21936478,[0,0,0,3,3,0,3,3,3,0],[0,0,0,0,0,0,0,0,0,3]],["라라593918",128.1521468,35.22026644,[13,15,15,23,23,14,19,17,24,25],[0,3,5,3,3,8,9,8,12,13]],["라라593919",128.152154,35.22116809,[0,0,0,0,0,0,0,3,6,3],[0,0,0,0,0,0,0,0,0,3]],["라라594912",128.1532022,35.21485059,[12,9,8,8,8,6,10,6,8,8],[3,3,3,3,3,3,5,5,5,3]],["라라594914",128.1532167,35.2166539,[0,0,0,0,0,0,0,0,3,16],[0,0,0,0,0,0,0,0,0,5]],["라라594918",128.1532456,35.22026051,[0,0,0,0,0,0,3,5,5,5],[0,0,0,0,0,0,3,3,5,5]],["라라595912",128.1543009,35.21484466,[0,0,0,0,0,3,0,0,0,null],[0,0,0,0,0,3,0,0,0,0]],["라라595913",128.1543082,35.21574631,[3,5,7,4,4,7,5,3,3,3],[3,3,3,3,3,5,3,3,5,3]]]</script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const grids=JSON.parse($("data").textContent);
+const years=Array.from({length:10},(_,i)=>2015+i);
+const metrics=["직장인구","사업체"];
+const units=["명","개"];
+const colors=["#167a78","#33649b"];
+const format=new Intl.NumberFormat("ko-KR");
+const value=(g,m,i)=>g[3+m][i]??null;
+const show=(v,m)=>v===null?"미집계":format.format(v)+units[m];
+const signed=(v,m)=>v===null?"—":(v>0?"+":"")+show(v,m);
+const pct=(a,b)=>b ? (a/b*100).toFixed(1)+"%" : "—";
+const stats=metrics.map((_,m)=>years.map((_,i)=>{
+  const valid=grids.filter(g=>value(g,m,i)!==null);
+  const common=valid.filter(g=>value(g,m,i-1)!==null);
+  const sum=valid.reduce((s,g)=>s+value(g,m,i),0);
+  const delta=common.reduce((s,g)=>s+value(g,m,i)-value(g,m,i-1),0);
+  return {sum,missing:grids.length-valid.length,common:common.length,delta};
+}));
+let sorted=[];
+function el(tag,text,cls) {
+  const node=document.createElement(tag);
+  if(text!==undefined) node.textContent=text;
+  if(cls) node.className=cls;
+  return node;
+}
+function chartRow(label,n,maximum,m,selected=false) {
+  const row=el("div",undefined,selected?"row selected":"row");
+  const track=el("div",undefined,"track");
+  const bar=el("div",undefined,"bar");
+  bar.style.width=pct(n,maximum);
+  track.setAttribute("aria-hidden","true");
+  track.append(bar);
+  row.append(el("span",label),track,el("span",show(n,m),"num"));
+  return row;
+}
+function makeCard(title,figure,note) {
+  const card=el("div",undefined,"card");
+  card.append(el("small",title),el("strong",figure),el("small",note));
+  return card;
+}
+function compareText(s,m) {
+  return s.common ? "전년 대비 "+signed(s.delta,m)+" · 공통 "+s.common+"격자" : "전년 비교 자료 없음";
+}
+function drawSummary(i) {
+  const a=stats[0][i], b=stats[1][i];
+  const paired=grids.filter(g=>value(g,0,i)!==null&&value(g,1,i)!==null);
+  const workers=paired.reduce((s,g)=>s+value(g,0,i),0);
+  const firms=paired.reduce((s,g)=>s+value(g,1,i),0);
+  $("cards").replaceChildren(
+    makeCard("직장인구",show(a.sum,0),compareText(a,0)),
+    makeCard("사업체 수",show(b.sum,1),compareText(b,1)),
+    makeCard("사업체당 직장인구",firms?(workers/firms).toFixed(1)+"명":"—","두 지표가 모두 있는 "+paired.length+"격자의 합계 비율"),
+    makeCard("미집계 격자",a.missing+" / "+b.missing,"직장인구 / 사업체 · 전체 "+grids.length+"격자"));
+  ["jobs","firms"].forEach((id,m)=>{
+    const max=Math.max(1,...stats[m].map(s=>s.sum));
+    $(id).replaceChildren(...years.map((y,j)=>chartRow(y+"년",stats[m][j].sum,max,m,j===i)));
+  });
+}
+function mapLink(g) {
+  const [id,lon,lat]=g;
+  const link=el("a","배경지도");
+  link.href="https://www.openstreetmap.org/?mlat="+lat+"&mlon="+lon+"#map=17/"+lat+"/"+lon;
+  link.target="_blank";
+  link.rel="noopener noreferrer";
+  link.setAttribute("aria-label",id+" 배경지도");
+  return link;
+}
+function drawMap(i,m) {
+  const map=$("map");
+  const lons=grids.map(g=>g[1]), lats=grids.map(g=>g[2]);
+  const minLon=Math.min(...lons), maxLon=Math.max(...lons), minLat=Math.min(...lats), maxLat=Math.max(...lats);
+  const midLon=(minLon+maxLon)/2, midLat=(minLat+maxLat)/2, factor=Math.cos(midLat*Math.PI/180);
+  const scale=Math.max((maxLon-minLon)*factor/(map.clientWidth*.86),(maxLat-minLat)/(map.clientHeight*.86));
+  const max=Math.max(1,...sorted.map(g=>value(g,m,i)??0));
+  map.replaceChildren(el("span","↑ 북 · 격자 중심"));
+  $("map-note").textContent=years[i]+"년 "+metrics[m]+" · 원본 좌표 기준 · 값이 큰 격자일수록 색이 진하며 회색은 미집계입니다.";
+  $("details").replaceChildren(el("p","격자 점을 선택하면 두 지표를 함께 확인할 수 있습니다."));
+  $("rank").style.setProperty("--series",colors[m]);
+  $("rank").replaceChildren(...sorted.filter(g=>value(g,m,i)!==null).slice(0,10).map(g=>chartRow(g[0],value(g,m,i),max,m)));
+  for(const g of sorted) {
+    const [id,lon,lat]=g;
+    const n=value(g,m,i);
+    const pin=el("button",undefined,"pin");
+    pin.type="button";
+    pin.title=id+" · "+show(n,m);
+    pin.style.left=`calc(50% + ${(lon-midLon)*factor/scale}px)`;
+    pin.style.top=`calc(50% + ${(midLat-lat)/scale}px)`;
+    pin.style.setProperty("--fill",n===null?"#7a8791":`color-mix(in srgb, ${colors[m]} ${32+68*Math.sqrt(n/max)}%, #eaf8f6)`);
+    pin.setAttribute("aria-label",pin.title);
+    pin.setAttribute("aria-pressed","false");
+    pin.onclick=()=>{
+      map.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===pin)));
+      $("details").replaceChildren(el("strong",id+" · "+years[i]+"년"),
+        ...metrics.map((label,k)=>el("p",label+" "+show(value(g,k,i),k))),mapLink(g));
+    };
+    map.append(pin);
+  }
+}
+function delta(g,m,i) {
+  const current=value(g,m,i), prior=value(g,m,i-1);
+  return current===null||prior===null?null:current-prior;
+}
+function drawTable(i) {
+  const query=$("search").value.trim().toLowerCase();
+  const shown=sorted.filter(g=>g[0].toLowerCase().includes(query));
+  $("table-note").textContent=shown.length+"개 격자 · 선택 지표 내림차순";
+  $("rows").replaceChildren(...shown.map(g=>{
+    const row=el("tr");
+    const linkCell=el("td");
+    linkCell.append(mapLink(g));
+    row.append(el("td",g[0]),
+      ...metrics.map((_,m)=>el("td",show(value(g,m,i),m),"num")),
+      ...metrics.map((_,m)=>el("td",signed(delta(g,m,i),m),"num")),linkCell);
+    return row;
+  }));
+}
+function refresh() {
+  const i=Number($("year").value), m=Number($("metric").value);
+  sorted=[...grids].sort((a,b)=>(value(b,m,i)??-1)-(value(a,m,i)??-1)||a[0].localeCompare(b[0]));
+  drawSummary(i);
+  drawMap(i,m);
+  drawTable(i);
+}
+$("year").replaceChildren(...years.map((y,i)=>new Option(y+"년",i)));
+$("year").value=years.length-1;
+$("year").onchange=refresh;
+$("metric").onchange=refresh;
+$("search").oninput=()=>drawTable(Number($("year").value));
+window.addEventListener("resize",()=>drawMap(Number($("year").value),Number($("metric").value)));
+refresh();
+</script></body></html>
